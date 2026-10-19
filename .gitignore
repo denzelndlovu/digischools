@@ -1,0 +1,14 @@
+node_modules
+dist
+.next
+.turbo
+.expo
+coverage
+.env
+.env.*
+!.env.example
+.pgdata
+*.log
+.DS_Store
+.theme-preview
+next-env.d.ts

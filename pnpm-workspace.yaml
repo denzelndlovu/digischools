@@ -1,0 +1,27 @@
+packages:
+  - apps/*
+  - packages/*
+  - tools/*
+allowBuilds:
+  esbuild: true
+  '@prisma/client': true
+  '@prisma/engines': true
+  prisma: true
+  argon2: true
+  '@swc/core': true
+  embedded-postgres: true
+  sharp: false
+  unrs-resolver: false
+  '@nestjs/core': false
+  '@scarf/scarf': false
+  '@embedded-postgres/darwin-arm64': true
+minimumReleaseAgeExclude:
+  - '@expo/cli@58.1.12'
+  - '@expo/metro-config@58.0.15'
+  - babel-preset-expo@58.0.18
+  - expo-asset@58.0.17
+  - expo-modules-cli@0.3.1
+  - expo-modules-core@58.0.23
+  - expo-modules-jsi@58.0.16
+  - expo-router@58.0.24
+  - expo@58.0.15
