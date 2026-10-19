@@ -1,0 +1,85 @@
+{
+  "school": {
+    "code": "sample-high",
+    "name": "Sample High School",
+    "shortName": "Sample High",
+    "motto": "Your school motto",
+    "country": "ZW",
+    "timezone": "Africa/Harare",
+    "domain": "samplehigh.digischools.app",
+    "customDomain": null,
+    "contact": { "email": "office@example.org", "phone": "+263000000000" }
+  },
+  "branding": {
+    "logo": "assets/logo.svg",
+    "favicon": "assets/favicon.png",
+    "appIcon": "assets/app-icon.png",
+    "colors": {
+      "primary": "#1B7A4B",
+      "accent": "#C9A227",
+      "overrides": { "light": {}, "dark": {} }
+    },
+    "fonts": { "heading": "Inter", "body": "Inter" },
+    "cornerRadius": "md",
+    "mobile": { "brandedBuild": false, "bundleId": "app.digischools.samplehigh" }
+  },
+  "locale": {
+    "languages": ["en"],
+    "defaultLanguage": "en",
+    "currency": "USD",
+    "dateFormat": "DD/MM/YYYY"
+  },
+  "academics": {
+    "formNames": ["Form 1", "Form 2", "Form 3", "Form 4", "Form 5", "Form 6"],
+    "classLabels": ["Blue", "Red", "Green", "Gold"],
+    "terms": [
+      { "name": "Term 1", "start": "2027-01-12", "end": "2027-04-09" },
+      { "name": "Term 2", "start": "2027-05-04", "end": "2027-08-06" },
+      { "name": "Term 3", "start": "2027-09-07", "end": "2027-12-03" }
+    ],
+    "gradingScale": [
+      { "grade": "A", "min": 75 },
+      { "grade": "B", "min": 65 },
+      { "grade": "C", "min": 50 },
+      { "grade": "D", "min": 40 },
+      { "grade": "U", "min": 0 }
+    ],
+    "similarityWarningThreshold": 15
+  },
+  "attendance": {
+    "schoolStart": "08:00",
+    "lateAfterMinutes": 0,
+    "readers": ["gate", "classroom", "sports-field", "tuckshop"],
+    "notifyParentOnTap": true
+  },
+  "billing": {
+    "perStudentTermFee": null,
+    "parentSubscription": { "enabled": true, "price": null, "period": "term" },
+    "paymentProviders": ["mock"],
+    "receiptFooter": "Thank you."
+  },
+  "wallet": {
+    "enabled": true,
+    "dailyLimitOptions": [3, 5, 8],
+    "defaultDailyLimit": 5,
+    "topUpAmounts": [5, 10, 20]
+  },
+  "modules": {
+    "keyCardAttendance": true,
+    "fees": true,
+    "tuckshopWallet": true,
+    "assignments": true,
+    "reportCards": true,
+    "sportsAndClubs": true,
+    "newslettersAndMagazines": true,
+    "helpDesk": true,
+    "staffLeave": true,
+    "library": false,
+    "transport": false,
+    "sickBay": false,
+    "boarding": false
+  },
+  "staffTypes": ["Teacher", "PE and sports coach", "Clubs coordinator", "Support staff"],
+  "notifications": { "push": true, "sms": false, "email": true },
+  "legal": { "privacyPolicyUrl": "", "termsUrl": "" }
+}
