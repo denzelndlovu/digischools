@@ -1,0 +1,44 @@
+@import 'tailwindcss';
+
+/* Semantic tokens only: the tenant theme sets --ds-* at runtime. Never use raw colors. */
+@theme inline {
+  --color-bg: var(--ds-bg);
+  --color-surface: var(--ds-surface);
+  --color-surface-raised: var(--ds-surface-raised);
+  --color-border: var(--ds-border);
+  --color-border-strong: var(--ds-border-strong);
+  --color-text: var(--ds-text);
+  --color-text-muted: var(--ds-text-muted);
+  --color-link: var(--ds-link);
+  --color-primary: var(--ds-primary);
+  --color-primary-hover: var(--ds-primary-hover);
+  --color-on-primary: var(--ds-on-primary);
+  --color-primary-subtle: var(--ds-primary-subtle);
+  --color-on-primary-subtle: var(--ds-on-primary-subtle);
+  --color-accent: var(--ds-accent);
+  --color-accent-hover: var(--ds-accent-hover);
+  --color-on-accent: var(--ds-on-accent);
+  --color-accent-subtle: var(--ds-accent-subtle);
+  --color-on-accent-subtle: var(--ds-on-accent-subtle);
+  --color-focus-ring: var(--ds-focus-ring);
+  --color-success: var(--ds-success);
+  --color-on-success: var(--ds-on-success);
+  --color-warning: var(--ds-warning);
+  --color-on-warning: var(--ds-on-warning);
+  --color-danger: var(--ds-danger);
+  --color-on-danger: var(--ds-on-danger);
+  --color-info: var(--ds-info);
+  --color-on-info: var(--ds-on-info);
+  --radius-theme: var(--radius);
+}
+
+body {
+  background: var(--ds-bg);
+  color: var(--ds-text);
+  font-family: var(--font-body, system-ui, sans-serif);
+}
+
+:focus-visible {
+  outline: 3px solid var(--ds-focus-ring);
+  outline-offset: 2px;
+}
