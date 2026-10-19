@@ -1,0 +1,208 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  STAFF
+  STUDENT
+  PARENT
+}
+
+enum StaffType {
+  TEACHER
+  PE_COACH
+  CLUB_COORDINATOR
+  SUPPORT_STAFF
+}
+
+enum UserStatus {
+  ACTIVE
+  BLOCKED
+  DEACTIVATED
+}
+
+enum TenantStatus {
+  ACTIVE
+  SUSPENDED
+}
+
+enum OtpPurpose {
+  LOGIN
+}
+
+// ---- Platform tables (no RLS; app role has read-only access) ----
+
+model Tenant {
+  id            String       @id @default(uuid()) @db.Uuid
+  code          String       @unique
+  name          String
+  status        TenantStatus @default(ACTIVE)
+  config        Json
+  configVersion Int          @default(1)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  domains TenantDomain[]
+  users   User[]
+
+  @@map("tenant")
+}
+
+model TenantDomain {
+  id         String    @id @default(uuid()) @db.Uuid
+  tenantId   String    @map("tenant_id") @db.Uuid
+  host       String    @unique
+  isCustom   Boolean   @default(false) @map("is_custom")
+  verifiedAt DateTime? @map("verified_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@map("tenant_domain")
+}
+
+// ---- Tenant tables (tenant_id + RLS). Composite FKs keep references inside one tenant. ----
+
+model User {
+  id           String     @default(uuid()) @db.Uuid
+  tenantId     String     @map("tenant_id") @db.Uuid
+  email        String?
+  phone        String?
+  passwordHash String     @map("password_hash")
+  role         Role
+  status       UserStatus @default(ACTIVE)
+  displayName  String     @map("display_name")
+  locale       String     @default("en")
+  lastLoginAt  DateTime?  @map("last_login_at")
+  createdAt    DateTime   @default(now()) @map("created_at")
+  updatedAt    DateTime   @updatedAt @map("updated_at")
+
+  tenant         Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  staffProfile   StaffProfile?
+  studentProfile StudentProfile?
+  childLinks     GuardianLink[]  @relation("ParentLinks")
+  parentLinks    GuardianLink[]  @relation("StudentLinks")
+  otpCodes       OtpCode[]
+  refreshTokens  RefreshToken[]
+
+  @@id([tenantId, id])
+  @@unique([id])
+  @@unique([tenantId, email])
+  @@unique([tenantId, phone])
+  @@map("user")
+}
+
+model StaffProfile {
+  tenantId   String    @map("tenant_id") @db.Uuid
+  userId     String    @map("user_id") @db.Uuid
+  staffType  StaffType @map("staff_type")
+  employeeNo String?   @map("employee_no")
+
+  user User @relation(fields: [tenantId, userId], references: [tenantId, id], onDelete: Cascade)
+
+  @@id([tenantId, userId])
+  @@map("staff_profile")
+}
+
+model StudentProfile {
+  tenantId    String  @map("tenant_id") @db.Uuid
+  userId      String  @map("user_id") @db.Uuid
+  admissionNo String  @map("admission_no")
+  formName    String  @map("form_name")
+  classLabel  String? @map("class_label")
+
+  user User @relation(fields: [tenantId, userId], references: [tenantId, id], onDelete: Cascade)
+
+  @@id([tenantId, userId])
+  @@unique([tenantId, admissionNo])
+  @@map("student_profile")
+}
+
+model GuardianLink {
+  id            String @default(uuid()) @db.Uuid
+  tenantId      String @map("tenant_id") @db.Uuid
+  parentUserId  String @map("parent_user_id") @db.Uuid
+  studentUserId String @map("student_user_id") @db.Uuid
+  relationship  String @default("guardian")
+
+  parent  User @relation("ParentLinks", fields: [tenantId, parentUserId], references: [tenantId, id], onDelete: Cascade)
+  student User @relation("StudentLinks", fields: [tenantId, studentUserId], references: [tenantId, id], onDelete: Cascade)
+
+  @@id([tenantId, id])
+  @@unique([tenantId, parentUserId, studentUserId])
+  @@map("guardian_link")
+}
+
+model OtpCode {
+  id         String     @default(uuid()) @db.Uuid
+  tenantId   String     @map("tenant_id") @db.Uuid
+  userId     String     @map("user_id") @db.Uuid
+  purpose    OtpPurpose
+  codeHash   String     @map("code_hash")
+  expiresAt  DateTime   @map("expires_at")
+  attempts   Int        @default(0)
+  consumedAt DateTime?  @map("consumed_at")
+  createdAt  DateTime   @default(now()) @map("created_at")
+
+  user User @relation(fields: [tenantId, userId], references: [tenantId, id], onDelete: Cascade)
+
+  @@id([tenantId, id])
+  @@index([tenantId, userId])
+  @@map("otp_code")
+}
+
+model RefreshToken {
+  id         String    @default(uuid()) @db.Uuid
+  tenantId   String    @map("tenant_id") @db.Uuid
+  userId     String    @map("user_id") @db.Uuid
+  familyId   String    @map("family_id") @db.Uuid
+  tokenHash  String    @map("token_hash")
+  expiresAt  DateTime  @map("expires_at")
+  revokedAt  DateTime? @map("revoked_at")
+  usedAt     DateTime? @map("used_at")
+  deviceName String?   @map("device_name")
+  createdAt  DateTime  @default(now()) @map("created_at")
+
+  user User @relation(fields: [tenantId, userId], references: [tenantId, id], onDelete: Cascade)
+
+  @@id([tenantId, id])
+  @@unique([tokenHash])
+  @@index([tenantId, familyId])
+  @@map("refresh_token")
+}
+
+model Term {
+  id           String   @default(uuid()) @db.Uuid
+  tenantId     String   @map("tenant_id") @db.Uuid
+  name         String
+  academicYear Int      @map("academic_year")
+  startDate    DateTime @map("start_date") @db.Date
+  endDate      DateTime @map("end_date") @db.Date
+
+  @@id([tenantId, id])
+  @@unique([tenantId, academicYear, name])
+  @@map("term")
+}
+
+model AuditLog {
+  id          String   @default(uuid()) @db.Uuid
+  tenantId    String   @map("tenant_id") @db.Uuid
+  actorUserId String?  @map("actor_user_id") @db.Uuid
+  action      String
+  entityType  String   @map("entity_type")
+  entityId    String?  @map("entity_id")
+  before      Json?
+  after       Json?
+  ip          String?
+  at          DateTime @default(now())
+
+  @@id([tenantId, id])
+  @@index([tenantId, at])
+  @@map("audit_log")
+}
